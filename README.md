@@ -23,7 +23,7 @@
 ## Configuration
 * if not specified, all configurations are done on side router by root.
 * assumes:
-	* main router `192.168.0.1/24`
+	* main router LAN address `192.168.0.1/24`
 	* side router `192.168.0.2/24`
 		* wireguard `10.0.0.2/24`
 	* VPN server `123.123.123.123`
@@ -128,18 +128,18 @@
 ## Optional
 * use flowtable
 	* edit `/etc/nftables.conf`
-	* add these lines to `table ip potato`
-		```
-		flowtable ft {
-			hook ingress priority filter
-			devices = { $eth0, wg0 }
-		}
-		```
-	* add this line to `chain forward`
-		```
-		ip protocol {tcp, udp} flow offload @ft
-		```
-	* (optionally) edit all `iifname`/`oifname` to `iif`/`oif`;
+		* add these lines to `table ip potato`
+			```
+			flowtable ft {
+				hook ingress priority filter
+				devices = { $eth0, wg0 }
+			}
+			```
+		* add this line to `chain forward`
+			```
+			ip protocol {tcp, udp} flow offload @ft
+			```
+		* (optionally) replace all `iifname`/`oifname` with `iif`/`oif`;
 	* default nftables service won't work anymore:
 		* `systemctl disable nftables`
 	* use an alternative service with modified dependency instead:
