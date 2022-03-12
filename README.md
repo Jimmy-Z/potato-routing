@@ -1,7 +1,8 @@
 ## CAUTION
+* this is more like a note for experienced administrators, not for a newbie to blindly follow, i.e. do **NOT** follow if you don't know what you're doing.
 * do **NOT** checkout this repo to `/`, read and edit configurations accordingly.
-* this is more like a note for experienced administrators, not for a newbie to blindly follow, do **NOT** follow if you don't know what you're doing.
-* absolutely no warranty.
+	* actually you can, but be careful.
+* tested on bullseye, but absolutely no warranty.
 
 ## Overview
 * our main router is likely a "home router" which also acts as switch and wireless AP.
@@ -11,13 +12,12 @@
 	* could be a virtual machine.
 * side router runs the VPN connection.
 	* in this tutorial, we use wireguard.
-		* preferably accompanied with udp2raw or phantun
+		* preferably accompanied with udp2raw or phantun.
 * our default gateway will be the side router.
 * when traffic reach side router, it will be routed to main router or VPN accordingly.
 * and a special DNS configuration is required.
 	* obviously we can't use DNS from ISP.
 	* use DNS from VPN will not be optimal.
-* tested on bullseye.
 * the name is a tribute to Tor.
 
 ## Configuration
@@ -113,13 +113,14 @@
 			* Apply
 * we can now test if routing/DNS are working:
 	* on a test host, manually set gateway and DNS to `192.168.0.2`
-	* https://www.ipip.net should show we're connected directly
-	* https://ipaddress.com should show we're connected via VPN
+	* https://www.ipip.net should show we're connected directly (via ISP).
+	* https://ipaddress.com should show we're connected via VPN.
 * DHCP server:
 	* `apt install dnsmasq`
 	* `/etc/dnsmasq.conf`
-	* (important) stop DHCP on the main router.
+	* (important) stop/disable DHCP server on the main router.
 	* `systemctl restart dnsmasq;systemctl status dnsmasq`
 * test if DHCP is working:
 	* on that test host, set it back to DHCP.
-	* on other hosts, disable/enable the adapter/Wi-Fi.
+	* on other hosts, disable then enable ethernet adapter or Wi-Fi.
+		* (Windows) `ipconfig /renew` won't work since DHCP server changed.
