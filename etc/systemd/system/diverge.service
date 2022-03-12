@@ -1,0 +1,15 @@
+[Unit]
+After=network-online.target
+After=redis.service
+Requires=redis.service
+
+[Service]
+Type=exec
+User=redis
+Group=redis
+EnvironmentFile=/etc/diverge.env
+ExecStart=/usr/local/bin/diverge -listen $LISTEN -redis $REDIS_SOCK -redis-index $REDIS_INDEX -block $BLOCK $EXTRA_ARGS
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
