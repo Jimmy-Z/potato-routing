@@ -124,3 +124,24 @@
 	* on that test host, set it back to DHCP.
 	* on other hosts, disable then enable ethernet adapter or Wi-Fi.
 		* (Windows) `ipconfig /renew` won't work since DHCP server changed.
+
+## Optional
+* use flowtable
+	* edit `/etc/nftables.conf`
+	* add these lines to `table ip potato`
+		```
+		flowtable ft {
+			hook ingress priority filter
+			devices = { $eth0, wg0 }
+		}
+		```
+	* add this line to `chain forward`
+		```
+		ip protocol {tcp, udp} flow offload @ft
+		```
+	* (optionally) edit all `iifname`/`oifname` to `iif`/`oif`;
+	* default nftables service won't work anymore:
+		* `systemctl disable nftables`
+	* use an alternative service with modified dependency instead:
+		* `/etc/systemd/system/nftables-delayed.service`
+		* `systemctl enable --now nftables-delayed`

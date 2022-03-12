@@ -14,8 +14,8 @@ LSTFILE="${CRDIR}/chnroutes.txt"
 
 # fetch update
 if ! git -C $CRDIR pull --depth=1 --rebase --allow-unrelated-histories; then
-        echo failed to fetch update
-        exit 1
+	echo failed to fetch update
+	exit 1
 fi
 git -C $CRDIR gc
 
@@ -25,16 +25,16 @@ pkill -USR1 diverge
 
 # nftables set files, always updated
 cidr2set () {
-        echo set "$1" '{'
-        echo    type ipv4_addr
-        echo    flags constant, interval
-        echo    auto-merge
-        echo    elements = '{'
-        while read n; do
-                echo "$n",
-        done
-        echo    '}'
-        echo '}'
+	echo set "$1" '{'
+	echo    type ipv4_addr
+	echo    flags constant, interval
+	echo    auto-merge
+	echo    elements = '{'
+	while read n; do
+		echo "$n",
+	done
+	echo    '}'
+	echo '}'
 }
 SETFILE="$POTATO/nft-set-$SETNAME.conf"
 grep -v '^#' "$LSTFILE"|cidr2set "$SETNAME" >"$SETFILE"
@@ -48,11 +48,11 @@ OUTFILE=$POTATO/dnsmasq-csr.conf
 ROUTES=$(grep -v '^#' $LSTFILE|grep -E '/(8|9|10|11)$'|awk '{printf "%s,192.168.0.1,", $1}')0.0.0.0/0,192.168.0.2
 echo dhcp-option=tag:lan,option:classless-static-route,$ROUTES > $TMPFILE
 if diff $TMPFILE $OUTFILE >/dev/null; then
-        echo $OUTFILE is up to date
+	echo $OUTFILE is up to date
 else
-        mv $TMPFILE $OUTFILE
-        echo reloading dnsmasq
-        systemctl reload dnsmasq
+	mv $TMPFILE $OUTFILE
+	echo reloading dnsmasq
+	systemctl reload dnsmasq
 fi
 
 rm -r "$WORKDIR"

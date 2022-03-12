@@ -1,0 +1,23 @@
+[Unit]
+Description=nftables but delayed loading
+Documentation=man:nft(8) http://wiki.nftables.org
+Requires=network-online.target
+After=network-online.target
+# edit/add interface names accordingly
+Requires=sys-subsystem-net-devices-enp1s0.device
+Requires=sys-subsystem-net-devices-wg0.device
+After=sys-subsystem-net-devices-enp1s0.device
+After=sys-subsystem-net-devices-wg0.device
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+StandardInput=null
+ProtectSystem=full
+ProtectHome=true
+ExecStart=/usr/sbin/nft -f /etc/nftables.conf
+ExecReload=/usr/sbin/nft -f /etc/nftables.conf
+ExecStop=/usr/sbin/nft flush ruleset
+
+[Install]
+WantedBy=multi-user.target
