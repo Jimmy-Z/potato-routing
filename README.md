@@ -1,5 +1,5 @@
 ## CAUTION
-* this is more like a note for experienced administrators, not for a newbie to blindly follow, i.e. do **NOT** follow if you don't know what you're doing.
+* this is more like a note for experienced administrators, not for a newbie to follow blindly, i.e. do **NOT** follow if you don't know what you're doing.
 * do **NOT** checkout this repo to `/`, read and edit configurations accordingly.
 	* actually you can, but be careful.
 * tested on bullseye, but absolutely no warranty.
@@ -14,7 +14,7 @@
 	* in this tutorial, we use wireguard.
 		* preferably accompanied with udp2raw or phantun.
 * our default gateway will be the side router.
-* when traffic reach side router, it will be routed to main router or VPN accordingly.
+* when outgoing packets reach side router, it will be routed to main router or VPN accordingly.
 * and a special DNS configuration is required.
 	* obviously we can't use DNS from ISP.
 	* use DNS from VPN will not be optimal.
@@ -46,8 +46,6 @@
 	* configuration for the VPN server is not covered here.
 		* almost identical sans lines for routing in interface config.
 	* configuration for udp2raw/phantun is not covered here.
-		* https://github.com/wangyu-/udp2raw
-		* https://github.com/dndx/phantun
 * IP list:
 	* `/usr/local/bin/update-china-lst`
 		```
@@ -69,8 +67,7 @@
 		* `ss -uanp|grep :53`
 		* `systemctl disable --now systemd-resolved`
 	* diverge:
-		* https://github.com/Jimmy-Z/go/tree/master/diverge
-			* not open source as of now.
+		* https://github.com/Jimmy-Z/diverge
 		* requires redis:
 			* `apt install redis`
 			* uncomment these lines in `/etc/redis/redis.conf`:
@@ -145,3 +142,25 @@
 	* use an alternative service with modified dependency instead:
 		* `/etc/systemd/system/nftables-delayed.service`
 		* `systemctl enable --now nftables-delayed`
+	* every time a interface is down and back up, we need to reload nftables,
+	since they're new interface now.
+
+## Troubleshoot
+* side router should be connected directly to main router.
+	* if there's just switches in between it should be fine.
+	* but if it's some _home router_(we don't want to point fingers, but it's Xiaomi) in bridge mode,
+	we've experienced some troubles.
+	typically connections supposed to go directly(via ISP) won't work.
+	* technical detail: when outgoing packets are routed to main router, it's not SNAT/masqueraded,
+	(we're in the same network, there is no need to), when corresponding incoming packets are back,
+	main router will send them directly, they don't go through side router, nice, right?
+	but if there is a stateful firewall in between, it can't see the big picture thus won't allow it.
+	it looks like those _home router_ still runs a stateful firewall even in bridge mode.
+	* solution: connect side router directly to main router, or SNAT direct connections too.
+
+## Thanks & Links
+* https://github.com/gaoyifan for general directions and ideas
+* https://github.com/misakaio/chnroutes2
+* https://www.wireguard.com/
+* https://github.com/wangyu-/udp2raw
+* https://github.com/dndx/phantun
